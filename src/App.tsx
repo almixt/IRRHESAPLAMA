@@ -407,8 +407,21 @@ export default function App() {
     setRows((p) => p.map((row, idx) => (idx === i ? { ...row, [k]: v } : row)));
 
   const reset = () => {
-    setA(DEFAULT_ASSUMPTIONS);
-    setRows(DEFAULT_ROWS);
+    setA((p) => ({
+      ...p,
+      annualRatePct: 0,
+      mgmtFeePct: 0,
+      monthlyFixed: 0,
+      setupCost: 0,
+    }));
+    setRows((p) =>
+      p.map((row) => ({
+        ...row,
+        disbursement: "0",
+        isCoupon: false,
+        principal: "0",
+      }))
+    );
   };
 
   const n = rows.length;
@@ -422,7 +435,7 @@ export default function App() {
           <h1>IRR Calculator Dashboard</h1>
         </div>
         <button className="ghost" onClick={reset}>
-          Varsayılana sıfırla
+          Sıfırla
         </button>
       </header>
 
