@@ -65,7 +65,7 @@ const num = (v) => {
 const tl = (x, dec = 0) =>
   !isFinite(x)
     ? "—"
-    : x.toLocaleString("tr-TR", {
+    : (x + 0).toLocaleString("tr-TR", {
         minimumFractionDigits: dec,
         maximumFractionDigits: dec,
       });
@@ -358,8 +358,9 @@ function compute(a, rows) {
   // I25 and J25 are blank. Net Fon IRR then runs over every row + its date.
   const K = rows.map((r, i) => (i === n - 1 ? H[i] : H[i] + I[i] + J[i]));
 
-  const grossIRR = xirr(H, dates);
-  const fundIRR = xirr(K, dates);
+  const anyFlow = H.some((v) => Math.abs(v) > 0.5);
+  const grossIRR = anyFlow ? xirr(H, dates) : NaN;
+  const fundIRR = anyFlow ? xirr(K, dates) : NaN;
   const totalInterest = E[n - 1];
   let fees = 0;
   for (let i = 0; i < n - 1; i++) fees += I[i] + J[i];
@@ -468,7 +469,11 @@ export default function App() {
             hint="Banking and Insurance Transactions Tax"
             suffix="%"
           >
-            <input value={a.bsmvPct} disabled inputMode="decimal" />
+          <input
+            value={a.bsmvPct}
+            onChange={(e) => setAssum("bsmvPct", e.target.value)}
+            inputMode="decimal"
+          />
           </Field>
           <Field
             label="Aylık sabit gider"
@@ -489,7 +494,11 @@ export default function App() {
             />
           </Field>
           <Field label="Gün sayacı" hint="Day count" suffix="gün">
-            <input value={a.dayCount} disabled inputMode="numeric" />
+          <input
+           value={a.dayCount}
+           onChange={(e) => setAssum("dayCount", e.target.value)}
+           inputMode="numeric"
+           />
           </Field>
         </div>
         <div className="derived">
